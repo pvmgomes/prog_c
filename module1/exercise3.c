@@ -10,6 +10,14 @@ struct Student {
 	float gpa;
 };
 
+char removeNewLine(char *buffer) {
+	size_t len = strlen(buffer);
+	if(len > 0 && buffer[len - 1] == '\n') {
+                buffer[len - 1] = '\0';
+        }
+	return *buffer;
+}
+
 int main(){
 	//Declare list
 	struct Student *studentList;
@@ -24,10 +32,7 @@ int main(){
 		return 1;
 	}
 	
-	size_t len = strlen(inputBuffer);
-	if(len > 0 && inputBuffer[len - 1] == '\n') {
-		inputBuffer[len - 1] = '\0';
-	}
+	removeNewLine(inputBuffer);
 
 	inputQtd = (int) strtol(inputBuffer, &endptr, 10);
 	if (endptr == inputBuffer && *endptr != '\0') {
@@ -50,11 +55,8 @@ int main(){
 			printf("Error reading name input!\n");
 			break;
 		}
-		//TODO: Extract newline remover to a function
-		len = strlen(name);
-		if(len > 0 && name[len - 1] == '\n') {
-                	name[len - 1] = '\0';
-        	}
+		
+		removeNewLine(name);
 		strncpy(studentList[counter].name, name, 50);
 
 		printf("Enter %s's GPA: \n", name);
@@ -80,22 +82,16 @@ int main(){
 		printf("Error reading input.\n");
 		return 1;
 	}
-	//TODO extract newline remover
-	len = strlen(inputBuffer);
-        if(len > 0 && inputBuffer[len - 1] == '\n') {
-		inputBuffer[len - 1] = '\0';
-	}
+	
+	removeNewLine(inputBuffer);
 	if (strcasecmp("yes", inputBuffer) == 0 || strcasecmp("y", inputBuffer) == 0) {
 		printf("How many students?\n");
 		if (fgets(inputBuffer, sizeof(inputBuffer), stdin) == NULL) {
 			printf("Error reading input.\n");
 			return 1;
 		}
-		//TODO extract newline remover
-	        len = strlen(inputBuffer);
-        	if(len > 0 && inputBuffer[len - 1] == '\n') {
-                	inputBuffer[len - 1] = '\0';
-        	}
+		
+	        removeNewLine(inputBuffer);
 		inputQtd = (int) strtol(inputBuffer, &endptr, 10);
 		printf("Adding %d more students.\n", inputQtd);
 		// update listSize
@@ -116,11 +112,8 @@ int main(){
                        		printf("Error reading name input!\n");
                         	break;
                 	}
-                	//TODO: Extract newline remover to a function
-                	len = strlen(name);
-                	if(len > 0 && name[len - 1] == '\n') {
-                        	name[len - 1] = '\0';
-                	}
+                	
+                	removeNewLine(name);
                 	strncpy(studentList[counter].name, name, 50);
 			
 			printf("Enter %s's GPA: \n", name);
