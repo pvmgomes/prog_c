@@ -109,7 +109,6 @@ int main(){
 		studentList = temp;
 		int count2 = 0;
 		while (count2 < inputQtd) {
-			counter++;
 			printf("Enter the studen's name: \n");
                 	//TODO: create constant for name size;
                 	char name[50];
@@ -138,6 +137,7 @@ int main(){
                 	studentList[counter].gpa = gpa;
                 	studentList[counter].id = counter;
 			count2++;
+			counter++;
 		}
 
 	}
