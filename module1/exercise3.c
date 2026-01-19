@@ -18,6 +18,43 @@ char removeNewLine(char *buffer) {
 	return *buffer;
 }
 
+int addStudents(struct Student *studentList, int inputQtd, int *counter) {
+	char inputBuffer[10];
+	int count = 0;
+	//Create student's list via input prompt
+        while(count < inputQtd) {
+                printf("Enter the student's name: \n");
+                //TODO: create constant for name size;
+                char name[50];
+                if (fgets(name, sizeof(name), stdin) == NULL) {
+                        printf("Error reading name input!\n");
+                        break;
+                }
+
+                removeNewLine(name);
+                strncpy(studentList[*counter].name, name, 50);
+
+		printf("Enter %s's GPA: \n", name);
+                if (fgets(inputBuffer, sizeof(inputBuffer), stdin) == NULL) {
+                        printf("Error reading GPA input!\n");
+                        break;
+                }
+                char *endptrF;
+                float gpa = strtof(inputBuffer, &endptrF);
+                if (endptrF == inputBuffer) {
+                        printf("Invalid input! GPA will be set to 0.0\n");
+                        gpa = 0.0;
+                }
+                studentList[*counter].gpa = gpa;
+                studentList[*counter].id = *counter;
+
+                count++;
+		*counter = *counter + 1;
+        }
+
+	return 0;
+}
+
 int main(){
 	//Declare list
 	struct Student *studentList;
@@ -47,35 +84,9 @@ int main(){
 	}
 	//Create student's list via input prompt
 	int counter = 0;
-	while(counter < inputQtd) {
-		printf("Enter the student's name: \n");
-		//TODO: create constant for name size;
-		char name[50];
-		if (fgets(name, sizeof(name), stdin) == NULL) {
-			printf("Error reading name input!\n");
-			break;
-		}
-		
-		removeNewLine(name);
-		strncpy(studentList[counter].name, name, 50);
-
-		printf("Enter %s's GPA: \n", name);
-		if (fgets(inputBuffer, sizeof(inputBuffer), stdin) == NULL) {
-			printf("Error reading GPA input!\n");
-			break;
-		}
-		char *endptrF;
-		float gpa = strtof(inputBuffer, &endptrF);
-		if (endptr == inputBuffer) {
-                        printf("Invalid input! GPA will be set to 0.0\n");
-                        gpa = 0.0;
-                }
-		studentList[counter].gpa = gpa;
-		studentList[counter].id = counter;
-		
-		counter++;
-		listSize = counter;
-	}
+	addStudents(studentList, inputQtd, &counter);
+	listSize = counter;
+	
 	//Ask if wants to add 1 more student
 	printf("Would you like to add more students?(y/n)\n");
 	if (fgets(inputBuffer, sizeof(inputBuffer), stdin) == NULL) {
@@ -103,35 +114,7 @@ int main(){
 			return 1;
 		}
 		studentList = temp;
-		int count2 = 0;
-		while (count2 < inputQtd) {
-			printf("Enter the studen's name: \n");
-                	//TODO: create constant for name size;
-                	char name[50];
-                	if (fgets(name, sizeof(name), stdin) == NULL) {
-                       		printf("Error reading name input!\n");
-                        	break;
-                	}
-                	
-                	removeNewLine(name);
-                	strncpy(studentList[counter].name, name, 50);
-			
-			printf("Enter %s's GPA: \n", name);
-                	if (fgets(inputBuffer, sizeof(inputBuffer), stdin) == NULL) {
-                        	printf("Error reading GPA input!\n");
-                        	break;
-                	}
-                	char *endptrF;
-                	float gpa = strtof(inputBuffer, &endptrF);
-                	if (endptr == inputBuffer) {
-                        	printf("Invalid input! GPA will be set to 0.0\n");
-                        	gpa = 0.0;
-                	}
-                	studentList[counter].gpa = gpa;
-                	studentList[counter].id = counter;
-			count2++;
-			counter++;
-		}
+		addStudents(studentList, inputQtd, &counter);
 
 	}
 	printf("Printing students' list. \n");
