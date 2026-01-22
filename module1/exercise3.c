@@ -6,6 +6,7 @@
 
 #define BUFFER_SIZE 10
 #define NAME_LENGTH 50
+#define BASE_10 10
 
 struct Student {
 	char name[NAME_LENGTH];
@@ -13,12 +14,11 @@ struct Student {
 	float gpa;
 };
 
-char removeNewLine(char *buffer) {
+void removeNewLine(char *buffer) {
 	size_t len = strlen(buffer);
 	if(len > 0 && buffer[len - 1] == '\n') {
                 buffer[len - 1] = '\0';
         }
-	return *buffer;
 }
 
 int addStudents(struct Student *studentList, int inputQtd, int *counter) {
@@ -58,25 +58,35 @@ int addStudents(struct Student *studentList, int inputQtd, int *counter) {
 	return 0;
 }
 
+int readQtyInput() {
+	char inputBuffer[BUFFER_SIZE];
+	char *endptr;
+	int inputQty = 0;
+	// Ask how many students
+        printf("How many students do you want to input?\n");
+        if (fgets(inputBuffer, sizeof(inputBuffer), stdin) == NULL) {
+                printf("Error reading input.\n");
+                return 1;
+        }
+
+        removeNewLine(inputBuffer);
+
+        inputQty = (int) strtol(inputBuffer, &endptr, BASE_10);
+        if (endptr == inputBuffer && *endptr != '\0') {
+                printf("Invalid number input!\n");
+        }
+
+	return inputQty;
+}
+
 int main(){
 	//Declare list
 	struct Student *classroom;
 	int inputQtd;
 	char inputBuffer[BUFFER_SIZE];
-	char *endptr;
-	// Ask how many students
-	printf("How many students do you want to input?\n");
-	if (fgets(inputBuffer, sizeof(int), stdin) == NULL) {
-		printf("Error reading input.\n");
-		return 1;
-	}
-	
-	removeNewLine(inputBuffer);
 
-	inputQtd = (int) strtol(inputBuffer, &endptr, BUFFER_SIZE);
-	if (endptr == inputBuffer && *endptr != '\0') {
-		printf("Invalid number input!\n");
-	}
+	// Ask how many students
+	inputQtd = readQtyInput();
 
 	//Create list pointer
 	classroom = (struct Student*) malloc(inputQtd * sizeof(struct Student));
@@ -97,14 +107,7 @@ int main(){
 	
 	removeNewLine(inputBuffer);
 	if (strcasecmp("yes", inputBuffer) == 0 || strcasecmp("y", inputBuffer) == 0) {
-		printf("How many students?\n");
-		if (fgets(inputBuffer, sizeof(inputBuffer), stdin) == NULL) {
-			printf("Error reading input.\n");
-			return 1;
-		}
-		
-	        removeNewLine(inputBuffer);
-		inputQtd = (int) strtol(inputBuffer, &endptr, BUFFER_SIZE);
+		inputQtd = readQtyInput();
 		printf("Adding %d more students.\n", inputQtd);
 		
 		// realloc - increase list size by the number input.
