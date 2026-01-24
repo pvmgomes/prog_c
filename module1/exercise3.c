@@ -21,6 +21,15 @@ void removeNewLine(char *buffer) {
         }
 }
 
+void clearInputBuffer(char *str) {
+    // If the string does NOT contain a newline, the buffer still has data
+    if (strchr(str, '\n') == NULL && !feof(stdin)) {
+        int c;
+        // Keep reading characters until we hit a newline or end of file
+        while ((c = getchar()) != '\n' && c != EOF);
+    }
+}
+
 int addStudents(struct Student *studentList, int inputQtd, int *counter) {
 	char inputBuffer[BUFFER_SIZE];
 	int count = 0;
@@ -34,6 +43,7 @@ int addStudents(struct Student *studentList, int inputQtd, int *counter) {
                         break;
                 }
 
+		clearInputBuffer(name);
                 removeNewLine(name);
                 strncpy(studentList[*counter].name, name, 50);
 
@@ -66,9 +76,9 @@ int readQtyInput() {
         printf("How many students do you want to input?\n");
         if (fgets(inputBuffer, sizeof(inputBuffer), stdin) == NULL) {
                 printf("Error reading input.\n");
-                return 1;
+                return -1;
         }
-
+	clearInputBuffer(inputBuffer);
         removeNewLine(inputBuffer);
 
         inputQty = (int) strtol(inputBuffer, &endptr, BASE_10);
@@ -105,6 +115,7 @@ int main(){
 		return 1;
 	}
 	
+	clearInputBuffer(inputBuffer);
 	removeNewLine(inputBuffer);
 	if (strcasecmp("yes", inputBuffer) == 0 || strcasecmp("y", inputBuffer) == 0) {
 		inputQtd = readQtyInput();
