@@ -7,6 +7,7 @@
 #define BUFFER_SIZE 10
 #define NAME_LENGTH 50
 #define BASE_10 10
+#define FILE_NAME "students.dat"
 
 struct Student {
 	char name[NAME_LENGTH];
@@ -36,7 +37,6 @@ int addStudents(struct Student *studentList, int inputQtd, int *counter) {
 	//Create student's list via input prompt
         while(count < inputQtd) {
                 printf("Enter the student's name: \n");
-                //TODO: create constant for name size;
                 char name[NAME_LENGTH];
                 if (fgets(name, sizeof(name), stdin) == NULL) {
                         printf("Error reading name input!\n");
@@ -91,50 +91,45 @@ int readQtyInput() {
 
 void saveToFile(struct Student *students, int count) {
 	FILE *fptr;
-	int *ptrCount = (int*) malloc(sizeof(count));
-	*ptrCount = count;
-
-	fptr = fopen("students.dat", "wb");
+	
+	fptr = fopen(FILE_NAME, "wb");
 	if (fptr == NULL) {
 		printf("Error opening the file.\n");
 	}
 
-	fwrite(ptrCount, sizeof(int), 1, fptr);
+	fwrite(&count, sizeof(int), 1, fptr);
 	fwrite(students, sizeof(struct Student), count, fptr);
 	fclose(fptr);
-	//free(fptr);
 	fptr = NULL;
-	free(ptrCount);
-	ptrCount = NULL;
 }
 
 struct Student* loadFromFile(int *count) {
 	FILE *fptr;
 	struct Student *students;
-	//FIXME add null check for malloc
 	int fcount;
 
-	fptr = fopen("students.dat", "rb");
+	fptr = fopen(FILE_NAME, "rb");
 	if (fptr == NULL) {
-		printf("Error opening the file.\n");
+		printf("Error opening the file. A new file will be created.\n");
 		return NULL;
 	}
+	// Retrieve variable that stores list size
 	fread(&fcount, sizeof(int), 1, fptr);
+	if (fcount <= 0) {
+		return NULL;
+	}
+	// Creates list pointer based on list size retieved
 	students = (struct Student*) malloc(fcount * sizeof(struct Student));
-	int listSize = fread(students, sizeof(struct Student), fcount, fptr);
-
-	printf("Counter from file: %d\n", fcount);
-	printf("Loaded list size: %d\n", listSize);
-
-	printf("Classroom's file students: \n");
-        for (int i = 0; i < fcount; i++) {
-                printf("  ID: %d,\n  Name: %s,\n  GPA: %.2F\n", students[i].id, students[i].name, students[i].gpa);
-                printf("------------------\n");
-        }
+	if (students == NULL) {
+		printf("Memory allocation failed.\n");
+		return NULL;
+	}
+	fread(students, sizeof(struct Student), fcount, fptr);
 
 	fclose(fptr);
 	fptr = NULL;
-
+	
+	*count = fcount;
 	return students;
 }
 
@@ -143,28 +138,34 @@ int main(){
 	struct Student *classroom;
 	int inputQtd;
 	char inputBuffer[BUFFER_SIZE];
+	int counter = 0;
 
-	//TODO: LOAD the students.dat file
-	//TODO: Check if the file exists and load it or create it if it doesn't exist
+	// Load the students.dat file
+	classroom = loadFromFile(&counter);
 
-	int listSize = 0;
-	struct Student *temp = loadFromFile(&listSize);
-	free(temp);
-	return 0;
 	// Ask how many students
 	inputQtd = readQtyInput();
 
-	//Create list pointer
-	classroom = (struct Student*) malloc(inputQtd * sizeof(struct Student));
 	if (classroom == NULL) {
-		printf("Memory allocation failed\n");
-		return 1;
+		//Create list pointer
+		classroom = (struct Student*) malloc(inputQtd * sizeof(struct Student));
+		if (classroom == NULL) {
+			printf("Memory allocation failed\n");
+			return 1;
+		}
+	} else {
+		// realloc list loaded from file to accomodate new students.
+		struct Student *temp = (struct Student*) realloc(classroom, (counter + inputQtd) * sizeof(struct Student));
+                if (temp == NULL) {
+                        printf("Reallocation failed. \n");
+                        return 1;
+                }
+                classroom = temp;
 	}
 	//Create student's list via input prompt
-	int counter = 0;
 	addStudents(classroom, inputQtd, &counter);
 		
-	//Ask if wants to add 1 more student
+	//Ask if wants to add more students
 	printf("Would you like to add more students?(y/n)\n");
 	if (fgets(inputBuffer, sizeof(inputBuffer), stdin) == NULL) {
 		printf("Error reading input.\n");
@@ -187,7 +188,7 @@ int main(){
 		addStudents(classroom, inputQtd, &counter);
 
 	}
-	//TODO Save students list to "students.dat"
+	//Save students list to file
 	saveToFile(classroom, counter);
 	printf("Printing classroom's list. \n");
 	//Print Students list
@@ -196,7 +197,7 @@ int main(){
 		printf("  ID: %d,\n  Name: %s,\n  GPA: %.2F\n", classroom[i].id, classroom[i].name, classroom[i].gpa);
 		printf("------------------\n");
 	}
-	//TODO: FREE pointer
+
 	free(classroom);
 	classroom = NULL;
 	return 0;
