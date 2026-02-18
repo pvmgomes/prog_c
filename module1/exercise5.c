@@ -136,6 +136,16 @@ struct Student* loadFromFile(int *count) {
 	return students;
 }
 
+void printClassroom(struct Student *classroom, int counter) {
+	//Print Students list
+        printf("Classroom's students: \n");
+        for (int i = 0; i < counter; i++) {
+                printf("  ID: %d,\n  Name: %s,\n  GPA: %.2F\n", classroom[i].id, classroom[i].name, classroom[i].gpa);
+                printf("------------------\n");
+        }
+
+}
+
 int main(){
 	//Declare list
 	struct Student *classroom;
@@ -158,10 +168,61 @@ int main(){
 		
 		switch(choice) {
 			case 1:
-				printf("View\n");
+				//PRINT CLASSROOM
+				if(classroom != NULL) {
+					printClassroom(classroom, counter);
+				} else {
+					printf("Classroom is empty!\n");
+				}
 				break;
 			case 2:
-				printf("Add\n");
+				// ADD STUDENTS
+				// Ask how many students
+        			inputQtd = readInputInt(INPUT_QTY_TXT);
+
+        			if (classroom == NULL) {
+                			//Create list pointer
+                			classroom = (struct Student*) malloc(inputQtd * sizeof(struct Student));
+                			if (classroom == NULL) {
+                        			printf("Memory allocation failed\n");
+                        			return 1;
+                			}
+        			} else {
+                			// realloc list loaded from file to accomodate new students.
+                			struct Student *temp = (struct Student*) realloc(classroom, (counter + inputQtd) * sizeof(struct Student));
+                			if (temp == NULL) {
+                        			printf("Reallocation failed. \n");
+                        			return 1;
+                			}
+                			classroom = temp;
+        			}
+        			//Create student's list via input prompt
+        			addStudents(classroom, inputQtd, &counter);
+
+				//Ask if wants to add more students
+        			printf("Would you like to add more students?(y/n)\n");
+        			if (fgets(inputBuffer, sizeof(inputBuffer), stdin) == NULL) {
+                			printf("Error reading input.\n");
+                			return 1;
+        			}
+
+        			clearInputBuffer(inputBuffer);
+        			removeNewLine(inputBuffer);
+        			if (strcasecmp("yes", inputBuffer) == 0 || strcasecmp("y", inputBuffer) == 0) {
+                			inputQtd = readInputInt(INPUT_QTY_TXT);
+                			printf("Adding %d more students.\n", inputQtd);
+
+                			// realloc - increase list size by the number input.
+                			struct Student *temp = (struct Student*) realloc(classroom, (counter + inputQtd) * sizeof(struct Student));
+                			if (temp == NULL) {
+                        			printf("Reallocation failed. \n");
+                        			return 1;
+                			}
+                			classroom = temp;
+                			addStudents(classroom, inputQtd, &counter);
+        			}
+
+
 				break;
 			case 3:
 				printf("Delete\n");
@@ -174,62 +235,8 @@ int main(){
 				printf("Invalid choice!\n");
 		}
 	}
-
-	// Ask how many students
-	inputQtd = readInputInt(INPUT_QTY_TXT);
-	return 0;
-
-	if (classroom == NULL) {
-		//Create list pointer
-		classroom = (struct Student*) malloc(inputQtd * sizeof(struct Student));
-		if (classroom == NULL) {
-			printf("Memory allocation failed\n");
-			return 1;
-		}
-	} else {
-		// realloc list loaded from file to accomodate new students.
-		struct Student *temp = (struct Student*) realloc(classroom, (counter + inputQtd) * sizeof(struct Student));
-                if (temp == NULL) {
-                        printf("Reallocation failed. \n");
-                        return 1;
-                }
-                classroom = temp;
-	}
-	//Create student's list via input prompt
-	addStudents(classroom, inputQtd, &counter);
-		
-	//Ask if wants to add more students
-	printf("Would you like to add more students?(y/n)\n");
-	if (fgets(inputBuffer, sizeof(inputBuffer), stdin) == NULL) {
-		printf("Error reading input.\n");
-		return 1;
-	}
 	
-	clearInputBuffer(inputBuffer);
-	removeNewLine(inputBuffer);
-	if (strcasecmp("yes", inputBuffer) == 0 || strcasecmp("y", inputBuffer) == 0) {
-		inputQtd = readInputInt(INPUT_QTY_TXT);
-		printf("Adding %d more students.\n", inputQtd);
-		
-		// realloc - increase list size by the number input.
-		struct Student *temp = (struct Student*) realloc(classroom, (counter + inputQtd) * sizeof(struct Student));
-		if (temp == NULL) {
-			printf("Reallocation failed. \n");
-			return 1;
-		}
-		classroom = temp;
-		addStudents(classroom, inputQtd, &counter);
-
-	}
-	//Save students list to file
 	saveToFile(classroom, counter);
-	printf("Printing classroom's list. \n");
-	//Print Students list
-	printf("Classroom's students: \n");
-	for (int i = 0; i < counter; i++) {
-		printf("  ID: %d,\n  Name: %s,\n  GPA: %.2F\n", classroom[i].id, classroom[i].name, classroom[i].gpa);
-		printf("------------------\n");
-	}
 
 	free(classroom);
 	classroom = NULL;
