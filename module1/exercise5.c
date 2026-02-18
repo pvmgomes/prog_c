@@ -146,6 +146,23 @@ void printClassroom(struct Student *classroom, int counter) {
 
 }
 
+void deleteById(struct Student *classroom, int *counter, int id) {
+	int deleteIndex;
+	//find by id (loop)
+	if(classroom != NULL) {
+		for (int i = 0; i < *counter; i++) {
+			if(classroom[i].id == id) {
+				printf("Found element at position: %d\n", i);
+				deleteIndex = i;
+				break;
+			}
+		}
+	}
+	//remove student
+	
+	//shift elements to the vacant position
+}
+
 int main(){
 	//Declare list
 	struct Student *classroom;
@@ -225,7 +242,9 @@ int main(){
 
 				break;
 			case 3:
-				printf("Delete\n");
+				printf("#### Delete\n");
+				int idToDel = readInputInt("Which student would you like to delete?(ID)\n");
+				deleteById(classroom, &counter, idToDel);
 				break;
 			case 4:
 				printf("Exit\n");
