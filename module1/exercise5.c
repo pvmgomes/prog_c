@@ -7,6 +7,8 @@
 #define NAME_LENGTH 50
 #define BASE_10 10
 #define FILE_NAME "students.dat"
+#define INPUT_QTY_TXT "How many students do you want to input?\n"
+#define CHOICE_TXT "Choice: \n"
 
 struct Student {
 	char name[NAME_LENGTH];
@@ -67,34 +69,12 @@ int addStudents(struct Student *studentList, int inputQtd, int *counter) {
 	return 0;
 }
 
-int readQtyInput() {
+int readInputInt(char *message) {
 	char inputBuffer[BUFFER_SIZE];
 	char *endptr;
-	int inputQty = 0;
-	// Ask how many students
-        printf("How many students do you want to input?\n");
-        if (fgets(inputBuffer, sizeof(inputBuffer), stdin) == NULL) {
-                printf("Error reading input.\n");
-                return -1;
-        }
-	clearInputBuffer(inputBuffer);
-        removeNewLine(inputBuffer);
+	int inputInt;
 
-        inputQty = (int) strtol(inputBuffer, &endptr, BASE_10);
-        if (endptr == inputBuffer && *endptr != '\0') {
-                printf("Invalid number input!\n");
-        }
-
-	return inputQty;
-}
-
-//FIXME refactor this to be reused.
-int readChoice() {
-	char inputBuffer[BUFFER_SIZE];
-	char *endptr;
-	int choice;
-
-	printf("Choice: \n");
+	printf("%s", message);
 	if (fgets(inputBuffer, sizeof(inputBuffer), stdin) == NULL) {
 		printf("Error reading input.\n");
 		return -1;
@@ -102,12 +82,13 @@ int readChoice() {
 	clearInputBuffer(inputBuffer);
 	removeNewLine(inputBuffer);
 
-	choice = (int) strtol(inputBuffer, &endptr, BASE_10);
+	inputInt = (int) strtol(inputBuffer, &endptr, BASE_10);
 	if (endptr == inputBuffer && *endptr != '\0') {
 		printf("invalid number input!\n");
+		return -1;
 	}
 
-	return choice;
+	return inputInt;
 }
 
 void saveToFile(struct Student *students, int count) {
@@ -171,7 +152,7 @@ int main(){
 		printf("\n---Classroom Management---\n");
 		printf("1. View students \n2. Add students \n3. Delete by ID \n4. Exit\n");
 		//printf("Choice: \n");
-		choice = readChoice();
+		choice = readInputInt(CHOICE_TXT);
 
 		printf("### Choice: %d\n", choice);
 		
@@ -192,12 +173,11 @@ int main(){
 			default:
 				printf("Invalid choice!\n");
 		}
-		running = 0;
 	}
-	return 0;
 
 	// Ask how many students
-	inputQtd = readQtyInput();
+	inputQtd = readInputInt(INPUT_QTY_TXT);
+	return 0;
 
 	if (classroom == NULL) {
 		//Create list pointer
@@ -228,7 +208,7 @@ int main(){
 	clearInputBuffer(inputBuffer);
 	removeNewLine(inputBuffer);
 	if (strcasecmp("yes", inputBuffer) == 0 || strcasecmp("y", inputBuffer) == 0) {
-		inputQtd = readQtyInput();
+		inputQtd = readInputInt(INPUT_QTY_TXT);
 		printf("Adding %d more students.\n", inputQtd);
 		
 		// realloc - increase list size by the number input.
