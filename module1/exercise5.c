@@ -147,7 +147,7 @@ void printClassroom(struct Student *classroom, int counter) {
 }
 
 void deleteById(struct Student *classroom, int *counter, int id) {
-	int deleteIndex;
+	int deleteIndex = -1;
 	//find by id (loop)
 	if(classroom != NULL) {
 		for (int i = 0; i < *counter; i++) {
@@ -157,10 +157,30 @@ void deleteById(struct Student *classroom, int *counter, int id) {
 				break;
 			}
 		}
+		if(deleteIndex == -1) {
+			printf("Student not found with ID: %d\n", id);
+			return;
+		} else {
+			//If it's the last element, delete by realloc.
+			if (!((*counter -1) == deleteIndex)) {
+				for (int i = deleteIndex; i < (*counter -1); i++) {
+                        	        classroom[i].id = classroom[i+1].id;
+                	                strncpy(classroom[i].name,  classroom[i+1].name, 50);
+        	                        classroom[i].gpa = classroom[i+1].gpa;
+	                        }
+
+			}
+			*counter = *counter -1;
+                        struct Student *temp = (struct Student *) realloc(classroom, ( *counter * sizeof(struct Student)));
+                        if (temp == NULL) {
+                                printf("Reallocation failed!\n");
+                                return;
+                        }
+                        classroom = temp;
+			printf("Deleted!\n");
+		}
 	}
-	//remove student
 	
-	//shift elements to the vacant position
 }
 
 int main(){
@@ -178,11 +198,9 @@ int main(){
 	while(running) {
 		printf("\n---Classroom Management---\n");
 		printf("1. View students \n2. Add students \n3. Delete by ID \n4. Exit\n");
-		//printf("Choice: \n");
+
 		choice = readInputInt(CHOICE_TXT);
 
-		printf("### Choice: %d\n", choice);
-		
 		switch(choice) {
 			case 1:
 				//PRINT CLASSROOM
@@ -242,19 +260,20 @@ int main(){
 
 				break;
 			case 3:
-				printf("#### Delete\n");
 				int idToDel = readInputInt("Which student would you like to delete?(ID)\n");
 				deleteById(classroom, &counter, idToDel);
+				//FIXME
+				//printClassroom(classroom, counter);
 				break;
 			case 4:
-				printf("Exit\n");
+				printf("Bye!\n");
 				running = 0;
 				break;
 			default:
 				printf("Invalid choice!\n");
 		}
 	}
-	
+
 	saveToFile(classroom, counter);
 
 	free(classroom);
