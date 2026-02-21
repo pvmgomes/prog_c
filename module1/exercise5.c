@@ -102,7 +102,6 @@ void saveToFile(struct Student *students, int count) {
 	fwrite(&count, sizeof(int), 1, fptr);
 	fwrite(students, sizeof(struct Student), count, fptr);
 	fclose(fptr);
-	//free(fptr);
 	fptr = NULL;
 }
 
@@ -148,11 +147,11 @@ void printClassroom(struct Student *classroom, int counter) {
 
 void deleteById(struct Student *classroom, int *counter, int id) {
 	int deleteIndex = -1;
-	//find by id (loop)
+
 	if(classroom != NULL) {
 		for (int i = 0; i < *counter; i++) {
 			if(classroom[i].id == id) {
-				printf("Found element at position: %d\n", i);
+				// element found
 				deleteIndex = i;
 				break;
 			}
@@ -164,9 +163,7 @@ void deleteById(struct Student *classroom, int *counter, int id) {
 			//If it's the last element, delete by realloc.
 			if (!((*counter -1) == deleteIndex)) {
 				for (int i = deleteIndex; i < (*counter -1); i++) {
-                        	        classroom[i].id = classroom[i+1].id;
-                	                strncpy(classroom[i].name,  classroom[i+1].name, 50);
-        	                        classroom[i].gpa = classroom[i+1].gpa;
+                        	       classroom[i] = classroom[i+1];
 	                        }
 
 			}
@@ -257,13 +254,10 @@ int main(){
                 			addStudents(classroom, inputQtd, &counter);
         			}
 
-
 				break;
 			case 3:
 				int idToDel = readInputInt("Which student would you like to delete?(ID)\n");
 				deleteById(classroom, &counter, idToDel);
-				//FIXME
-				//printClassroom(classroom, counter);
 				break;
 			case 4:
 				printf("Bye!\n");
