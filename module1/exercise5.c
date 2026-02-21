@@ -145,7 +145,7 @@ void printClassroom(struct Student *classroom, int counter) {
 
 }
 
-void deleteById(struct Student *classroom, int *counter, int id) {
+struct Student* deleteById(struct Student *classroom, int *counter, int id) {
 	int deleteIndex = -1;
 
 	if(classroom != NULL) {
@@ -158,7 +158,7 @@ void deleteById(struct Student *classroom, int *counter, int id) {
 		}
 		if(deleteIndex == -1) {
 			printf("Student not found with ID: %d\n", id);
-			return;
+			return classroom;
 		} else {
 			//If it's the last element, delete by realloc.
 			if (!((*counter -1) == deleteIndex)) {
@@ -169,12 +169,9 @@ void deleteById(struct Student *classroom, int *counter, int id) {
 			}
 			*counter = *counter -1;
                         struct Student *temp = (struct Student *) realloc(classroom, ( *counter * sizeof(struct Student)));
-                        if (temp == NULL) {
-                                printf("Reallocation failed!\n");
-                                return;
-                        }
-                        classroom = temp;
+                        
 			printf("Deleted!\n");
+			return (temp != NULL) ? temp : classroom;
 		}
 	}
 	
@@ -188,6 +185,7 @@ int main(){
 	int counter = 0;
 	int running = 1;
 	int choice;
+	int idToDel = -1;
 
 	// Load the students.dat file
 	classroom = loadFromFile(&counter);
@@ -256,8 +254,8 @@ int main(){
 
 				break;
 			case 3:
-				int idToDel = readInputInt("Which student would you like to delete?(ID)\n");
-				deleteById(classroom, &counter, idToDel);
+				idToDel = readInputInt("Which student would you like to delete?(ID)\n");
+				classroom = deleteById(classroom, &counter, idToDel);
 				break;
 			case 4:
 				printf("Bye!\n");
