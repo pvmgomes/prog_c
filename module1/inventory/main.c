@@ -3,7 +3,18 @@
 
 int main() {
     int running = 1;
-    int choice = -1; //innitialize choice with an invalid option
+    int choice = -1; // initialize choice with an invalid option
+    int capacity = 2; // initial capacity is 2 as per requirement
+   
+    //TODO Load file
+
+    //TODO initialise items list with space for 2 elements
+    struct Item *items = (struct Item*) malloc(sizeof(struct Item) * capacity);
+    if (items == NULL) {
+        printf("Failed memory allocation!\n");
+        return -1;
+    }
+
     // Loop to keep the program running until user chooses to exit
     while(running) {
         printf("---- Inventory Management ----\n");
